@@ -15,13 +15,13 @@ const BACKENDS = {
   demo:  'https://FILL_IN_RENDER_APP_URL',
 };
 
-const _backendKey = (() => {
-  const param = new URLSearchParams(window.location.search).get('backend');
-  if (param && BACKENDS[param]) return param;
-  return ['localhost', '127.0.0.1'].includes(window.location.hostname) ? 'local' : 'demo';
+const _param = new URLSearchParams(window.location.search).get('backend');
+const BACKEND_URL = (() => {
+  if (_param && _param.startsWith('http')) return _param.replace(/\/$/, '');
+  if (_param && BACKENDS[_param]) return BACKENDS[_param];
+  return ['localhost', '127.0.0.1'].includes(window.location.hostname)
+    ? BACKENDS.local : BACKENDS.demo;
 })();
-
-const BACKEND_URL = BACKENDS[_backendKey];
 const WS_URL = BACKEND_URL.replace(/^http/, 'ws') + '/ws/live';
 
 // ── Constants ────────────────────────────────────────────────────────────────
