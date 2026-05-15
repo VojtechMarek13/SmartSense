@@ -1,6 +1,6 @@
-<p align="center">
+<div align="center">
   <img src="App/web/static/smartsense_logo.svg" alt="SmartSense" height="80" />
-</p>
+</div>
 
 <p align="center">
   <b>Vibrodiagnostics & predictive maintenance for collaborative robot harmonic drives.</b><br/>
