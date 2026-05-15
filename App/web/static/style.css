@@ -6,10 +6,10 @@
 
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: linear-gradient(135deg, #E6F3EE 0%, #F8F3E9 100%);
+  background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%);
   background-attachment: fixed;
   min-height: 100vh;
-  color: #18332B;
+  color: #0f172a;
   font-size: 13px;
 }
 
@@ -25,9 +25,9 @@ body {
 /* ── Cards ──────────────────────────────────────────── */
 
 .card {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   border-radius: 24px;
-  border: 1px solid rgba(24, 51, 43, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.08);
   padding: 20px 24px;
   backdrop-filter: blur(4px);
 }
@@ -36,7 +36,7 @@ body {
   font-size: 17px;
   font-weight: 700;
   margin-bottom: 14px;
-  color: #18332B;
+  color: #0f172a;
 }
 
 /* ── Header ─────────────────────────────────────────── */
@@ -49,16 +49,9 @@ body {
   padding: 18px 28px;
 }
 
-.header-title h1 {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-.header-title .subtitle {
-  color: #58756B;
-  font-size: 13px;
-  margin-top: 4px;
+.header-logo {
+  height: 52px;
+  width: auto;
 }
 
 .header-controls {
@@ -72,9 +65,9 @@ select {
   height: 40px;
   border-radius: 14px;
   padding: 0 14px;
-  border: 1px solid rgba(24, 51, 43, 0.14);
+  border: 1px solid rgba(15, 23, 42, 0.14);
   background: white;
-  color: #18332B;
+  color: #0f172a;
   font-family: inherit;
   font-size: 13px;
   outline: none;
@@ -83,7 +76,7 @@ select {
 }
 
 select:focus {
-  border-color: #1A9C74;
+  border-color: #0ea5e9;
 }
 
 button {
@@ -91,7 +84,7 @@ button {
   border-radius: 14px;
   padding: 0 22px;
   border: none;
-  background: #1A9C74;
+  background: #0ea5e9;
   color: white;
   font-family: inherit;
   font-size: 13px;
@@ -102,11 +95,11 @@ button {
 }
 
 button:hover:not(:disabled) {
-  background: #158b65;
+  background: #0284c7;
 }
 
 button:disabled {
-  background: #8ecfba;
+  background: #7dd3fc;
   cursor: not-allowed;
 }
 
@@ -151,8 +144,8 @@ button:disabled {
 }
 
 .live-badge.connected {
-  background: #dcfce7;
-  color: #166534;
+  background: #e0f2fe;
+  color: #075985;
 }
 
 .live-controls {
@@ -161,7 +154,7 @@ button:disabled {
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #4C655D;
+  color: #475569;
   font-weight: 600;
 }
 
@@ -210,7 +203,7 @@ button:disabled {
   font-size: 15px;
   font-weight: 700;
   margin-bottom: 4px;
-  color: #18332B;
+  color: #0f172a;
 }
 
 .health-jhi {
@@ -218,11 +211,11 @@ button:disabled {
   font-weight: 800;
   line-height: 1;
   margin-bottom: 8px;
-  color: #18332B;
+  color: #0f172a;
 }
 
 .health-rec {
-  color: #4C655D;
+  color: #475569;
   font-size: 12px;
   line-height: 1.5;
 }
@@ -238,7 +231,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(24, 51, 43, 0.07);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
 }
 
 .metric:last-child {
@@ -249,7 +242,7 @@ button:disabled {
 .metric-label {
   font-size: 11px;
   font-weight: 700;
-  color: #4C655D;
+  color: #475569;
   text-transform: uppercase;
   letter-spacing: 0.4px;
   margin-bottom: 2px;
@@ -258,7 +251,7 @@ button:disabled {
 .metric-value {
   font-size: 22px;
   font-weight: 800;
-  color: #18332B;
+  color: #0f172a;
   line-height: 1.2;
 }
 
@@ -268,7 +261,7 @@ button:disabled {
 }
 
 .meta-empty {
-  color: #7a9e93;
+  color: #94a3b8;
   font-style: italic;
   font-size: 13px;
   margin-top: 4px;
@@ -279,7 +272,7 @@ button:disabled {
   justify-content: space-between;
   align-items: baseline;
   padding: 5px 0;
-  border-bottom: 1px solid rgba(24, 51, 43, 0.06);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
   gap: 12px;
 }
 
@@ -288,14 +281,14 @@ button:disabled {
 }
 
 .meta-key {
-  color: #4C655D;
+  color: #475569;
   font-weight: 600;
   font-size: 12px;
   flex-shrink: 0;
 }
 
 .meta-val {
-  color: #18332B;
+  color: #0f172a;
   font-size: 12px;
   text-align: right;
 }
@@ -303,7 +296,7 @@ button:disabled {
 .meta-threshold-row {
   padding: 6px 0 0;
   font-size: 11px;
-  color: #4C655D;
+  color: #475569;
   line-height: 1.6;
 }
 
@@ -332,5 +325,8 @@ button:disabled {
   }
   select {
     min-width: 200px;
+  }
+  .header-logo {
+    height: 40px;
   }
 }

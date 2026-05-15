@@ -27,25 +27,25 @@ const WS_URL = BACKEND_URL.replace(/^http/, 'ws') + '/ws/live';
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const COLORS = {
-  signalX:    '#0F8B8D',
-  signalY:    '#F28F3B',
-  rms:        '#2D7DD2',
-  movingAvg:  '#35A675',
-  jhi:        '#D8434B',
-  warning:    '#E8A317',
-  critical:   '#D8434B',
+  signalX:    '#0ea5e9',
+  signalY:    '#f59e0b',
+  rms:        '#3b82f6',
+  movingAvg:  '#10b981',
+  jhi:        '#6366f1',
+  warning:    '#f59e0b',
+  critical:   '#ef4444',
 };
 
 const STATE_COLORS = {
-  NORMAL:   '#23B26D',
-  WARNING:  '#E8A317',
-  CRITICAL: '#D8434B',
+  NORMAL:   '#22c55e',
+  WARNING:  '#f59e0b',
+  CRITICAL: '#ef4444',
 };
 
 const PLOT_DEFAULTS = {
   paper_bgcolor: 'rgba(0,0,0,0)',
-  plot_bgcolor:  '#F8FAFB',
-  font:          { family: 'Segoe UI, system-ui, sans-serif', size: 12, color: '#18332B' },
+  plot_bgcolor:  '#f8fafc',
+  font:          { family: 'Segoe UI, system-ui, sans-serif', size: 12, color: '#0f172a' },
   margin:        { t: 16, r: 16, b: 44, l: 56 },
   showlegend:    true,
   legend:        { bgcolor: 'rgba(255,255,255,0.7)', bordercolor: 'rgba(0,0,0,0)', x: 0, y: 1 },
@@ -150,8 +150,8 @@ function renderSignalChart(signal) {
 
   const layout = {
     ...PLOT_DEFAULTS,
-    xaxis: { title: 'Sample index (downsampled view)', gridcolor: '#e4ece8', zeroline: false },
-    yaxis: { title: 'Acceleration [mg]',               gridcolor: '#e4ece8', zeroline: false },
+    xaxis: { title: 'Sample index (downsampled view)', gridcolor: '#e2e8f0', zeroline: false },
+    yaxis: { title: 'Acceleration [mg]',               gridcolor: '#e2e8f0', zeroline: false },
     legend: { ...PLOT_DEFAULTS.legend, x: 0.72, y: 1 },
   };
 
@@ -188,8 +188,8 @@ function renderTrendChart(trend) {
   const layout = {
     ...PLOT_DEFAULTS,
     margin: { ...PLOT_DEFAULTS.margin, r: 64 },
-    xaxis:  { title: 'Sliding window', gridcolor: '#e4ece8', zeroline: false },
-    yaxis:  { title: 'RMS vector [mg]', gridcolor: '#e4ece8', zeroline: false },
+    xaxis:  { title: 'Sliding window', gridcolor: '#e2e8f0', zeroline: false },
+    yaxis:  { title: 'RMS vector [mg]', gridcolor: '#e2e8f0', zeroline: false },
     yaxis2: {
       title: 'Joint Health Index',
       overlaying: 'y', side: 'right',
@@ -219,8 +219,8 @@ function renderTrendChart(trend) {
 function initEmptyCharts() {
   const emptyLayout = {
     ...PLOT_DEFAULTS,
-    xaxis: { title: 'Sample', gridcolor: '#e4ece8', zeroline: false },
-    yaxis: { title: 'Acceleration [mg]', gridcolor: '#e4ece8', zeroline: false },
+    xaxis: { title: 'Sample', gridcolor: '#e2e8f0', zeroline: false },
+    yaxis: { title: 'Acceleration [mg]', gridcolor: '#e2e8f0', zeroline: false },
     margin: { ...PLOT_DEFAULTS.margin, t: 10 },
     legend: { ...PLOT_DEFAULTS.legend, x: 0.82, y: 1 },
   };
@@ -304,8 +304,8 @@ async function onJointChange() {
   ], {
     ...PLOT_DEFAULTS,
     margin: { t: 8, r: 16, b: 40, l: 56 },
-    xaxis: { title: 'Sample', gridcolor: '#e4ece8', zeroline: false },
-    yaxis: { title: 'Acceleration [mg]', gridcolor: '#e4ece8', zeroline: false },
+    xaxis: { title: 'Sample', gridcolor: '#e2e8f0', zeroline: false },
+    yaxis: { title: 'Acceleration [mg]', gridcolor: '#e2e8f0', zeroline: false },
     legend: { ...PLOT_DEFAULTS.legend, x: 0.82, y: 1 },
   }, PLOTLY_CONFIG);
 }

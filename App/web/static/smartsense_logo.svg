@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="120" viewBox="0 0 480 120">
+  <rect x="0" y="12" width="96" height="96" rx="28" fill="#0f172a"/>
+  <polyline points="18,60 30,60 39,36 51,84 60,50 69,68 78,60"
+    stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="84" cy="76" r="6" fill="#0ea5e9"/>
+
+  <text x="116" y="58"
+    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-weight="700" font-size="32" letter-spacing="-0.5"
+    fill="#0f172a">SMART<tspan fill="#0ea5e9">SENSE</tspan></text>
+  <text x="118" y="80"
+    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-weight="400" font-size="12" letter-spacing="3"
+    fill="#94a3b8">INDUSTRIAL MAINTENANCE AI</text>
+</svg>

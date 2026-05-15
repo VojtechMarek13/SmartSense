@@ -1,63 +1,40 @@
-# SmartSense
+<p align="center">
+  <img src="App/web/static/smartsense_logo.svg" alt="SmartSense" height="80" />
+</p>
 
-**Vibrodiagnostics & predictive maintenance for collaborative robot harmonic drives.**
-
-SmartSense monitors the health of harmonic-drive joints in collaborative robots (cobots) by analysing vibration signals from paired X/Y sensors. It computes a Joint Health Index (JHI), estimates time to critical threshold, and streams live sensor data over WebSocket — all accessible from a web browser.
-
----
-
-## Live demo
-
-| Mode | URL |
-|------|-----|
-| Cloud demo (Render) | _coming soon_ |
-| Live workplace (Cloudflare Tunnel) | _coming soon_ |
-
-> **GitHub Pages frontend:** https://vojtechmarek13.github.io/SmartSense/
->
-> Append `?backend=live` to the URL to connect to the live workplace backend instead of the cloud demo.
+<p align="center">
+  <b>Vibrodiagnostics & predictive maintenance for collaborative robot harmonic drives.</b><br/>
+  <a href="https://vojtechmarek13.github.io/SmartSense/">Live Demo</a> &nbsp;·&nbsp;
+  <a href="https://vojtechmarek13.github.io/SmartSense/?backend=https://YOUR_TUNNEL.trycloudflare.com">Live Workplace</a>
+</p>
 
 ---
 
-## Key features
+SmartSense monitors the health of harmonic-drive joints in collaborative robots by analysing paired X/Y vibration signals. It computes a **Joint Health Index (JHI 0–100)**, estimates time to critical threshold, and streams live sensor data over WebSocket — accessible from any browser.
 
-- **Joint Health Index (JHI 0–100)** — weighted scoring from RMS, crest factor, spectral analysis, trend and joint age
-- **Predictive maintenance** — linear regression extrapolation estimates hours to critical threshold
-- **Live OPC UA streaming** — real-time vibration waveform over WebSocket (simulator included, real `asyncua` client ready to connect)
-- **Historical trend calibration** — dynamic warning/critical thresholds adapted from measurement history
-- **Dual interface** — PyQt6 desktop dashboard + FastAPI web dashboard served from the same backend
+## Features
 
----
+- **Joint Health Index** — weighted scoring from RMS, crest factor, spectral analysis, trend and operating age
+- **Predictive maintenance** — linear regression extrapolation estimates hours remaining to critical threshold
+- **Live OPC UA streaming** — real-time vibration waveform over WebSocket (simulator included, real `asyncua` client ready)
+- **Historical calibration** — dynamic warning/critical thresholds adapted from measurement history across dates
+- **Dual interface** — PyQt6 desktop dashboard + FastAPI web dashboard from the same backend
 
 ## Architecture
 
 ```
-[Cobot PLC]
-    │  OPC UA (asyncua)
-    ▼
-[FastAPI backend]  ──── REST + WebSocket (wss://) ────►  [GitHub Pages — JS frontend]
-    │                                                         │
-    ├── /api/measurements      list available CSV datasets    │
-    ├── /api/analysis/{id}     full JHI analysis + signal     │
-    ├── /api/joints            list joints                    │
-    └── /ws/live               live vibration stream          │
-                                                              │
-                                             ?backend=live  ──┤── Cloudflare Tunnel → workplace PC
-                                             (default)      ──┘── Render.com cloud
+[Cobot PLC] ── OPC UA ──► [FastAPI backend] ── REST + WebSocket (wss://) ──► [GitHub Pages frontend]
+                                │
+                    ┌───────────┴───────────┐
+              Cloudflare Tunnel         Render.com
+            (live workplace demo)    (cloud demo 24/7)
 ```
 
-### Signal processing pipeline
-
+**Signal pipeline:**
 ```
-CSV (AxisX / AxisY)
-    └─► VibrationDataLoader
-            └─► VibrationFeatureExtractor  (FFT, Hanning window, 2048 samples)
-                    └─► JointHealthAnalyzer  (JHI scoring)
-                            └─► HistoricalThresholdCalibrator
-                                    └─► SmartSenseAnalysisPipeline → API / GUI
+CSV (AxisX / AxisY) → VibrationDataLoader → VibrationFeatureExtractor (FFT, Hanning 2048)
+  → JointHealthAnalyzer (JHI) → HistoricalThresholdCalibrator → API / GUI
 ```
-
----
 
 ## Tech stack
 
@@ -70,77 +47,60 @@ CSV (AxisX / AxisY)
 | Frontend | Vanilla JS, Plotly.js |
 | Deployment | GitHub Pages · Cloudflare Tunnel · Render.com |
 
----
-
 ## Local setup
 
 ```powershell
-# Clone and install
 git clone https://github.com/VojtechMarek13/SmartSense.git
 cd SmartSense
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -e .
 
-# Run web server (http://localhost:8000)
-python -m App.web.server
-
-# Run desktop dashboard
-python -m App.main
+python -m App.web.server     # web dashboard → http://localhost:8000
+python -m App.main           # desktop dashboard
 ```
 
-Place your measurement data in `data/` following the structure:
+Place measurement data in `data/` following:
 ```
-data/
-  Joint {1-5}/
-    {DD.MM.YYYY}/
-      Cobot Stand/
-        Trajectory {1-5}/
-          CobotStandAxisX_*.csv
-          CobotStandAxisY_*.csv
+data/Joint {1-5}/{DD.MM.YYYY}/Cobot Stand/Trajectory {1-5}/
+  CobotStandAxisX_*.csv
+  CobotStandAxisY_*.csv
 ```
 
-> The `data_demo/` folder (committed) contains truncated sample data (5 000 rows per file) for cloud deployment. Regenerate it after adding new measurements:
-> ```powershell
-> python scripts/make_demo_data.py
-> ```
-
----
+> `data_demo/` (committed) contains truncated 5 000-row samples for cloud deployment.
+> Regenerate after adding new measurements: `python scripts/make_demo_data.py`
 
 ## Deployment
 
-### GitHub Pages (frontend)
+### GitHub Pages — frontend
+Deployed automatically on every push to `main` via `.github/workflows/deploy-pages.yml`.
+Enable in **Settings → Pages → Source: GitHub Actions**.
 
-Automatically deployed on every push to `main` via `.github/workflows/deploy-pages.yml`.  
-Enable in repository **Settings → Pages → Source: GitHub Actions**.
-
-### Cloudflare Tunnel (live workplace backend)
-
+### Cloudflare Tunnel — live workplace backend
 ```powershell
-# Install cloudflared, then:
-cloudflared tunnel login
-cloudflared tunnel create smartsense
-cloudflared tunnel run --url http://localhost:8000 smartsense
+cloudflared tunnel --url http://127.0.0.1:8000
+```
+Share the dashboard with the tunnel URL as a parameter:
+```
+https://vojtechmarek13.github.io/SmartSense/?backend=https://YOUR_TUNNEL.trycloudflare.com
 ```
 
-Copy the tunnel URL into `BACKENDS.live` in [App/web/static/app.js](App/web/static/app.js).
+### Render.com — cloud demo backend
+Connect this repository on [render.com](https://render.com) — `render.yaml` is detected automatically.
+Set `BACKENDS.demo` in `App/web/static/app.js` to the Render service URL.
 
-### Render.com (cloud demo backend)
+## Data & privacy
 
-Connect this repository on [render.com](https://render.com) — `render.yaml` is detected automatically.  
-Copy the service URL into `BACKENDS.demo` in [App/web/static/app.js](App/web/static/app.js).
-
----
+Raw measurement CSV files (~1.7 GB) are excluded from the repository via `.gitignore`.
+Only `data_demo/` (13 MB, truncated samples) is committed for cloud deployment.
 
 ## Project status
 
-- Functional heuristic JHI scoring across 5 joints
-- 3 measurement dates (Feb–Mar 2026), historical trend calibration active
-- OPC UA simulator included; real PLC connection ready to configure
-- PyTorch bridge placeholder prepared for future ML model integration
+- Functional heuristic JHI scoring across 5 joints, 3 measurement dates (Feb–Mar 2026)
+- GitHub Pages frontend live, Cloudflare Tunnel tested and working
+- OPC UA simulator active; real PLC connection ready to configure via `asyncua`
+- PyTorch bridge prepared for future ML model integration
 
 ---
 
-## License
-
-Internal research project — JIC (Jihomoravské inovační centrum).
+*Internal research project — JIC (Jihomoravské inovační centrum)*
