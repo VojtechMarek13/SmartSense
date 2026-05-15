@@ -1,0 +1,17 @@
+[project]
+name = "smartsense"
+version = "0.1.0"
+description = "Industrial vibrodiagnostics and predictive maintenance for harmonic drives."
+requires-python = ">=3.14,<3.15"
+dependencies = [
+  "numpy",
+  "torch",
+  "PyQt6",
+  "matplotlib",
+  "fastapi>=0.110.0",
+  "uvicorn[standard]>=0.29.0",
+  "asyncua>=1.0.0",
+]
+
+[tool.smartsense]
+python-version = "3.14"

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartSense</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+</head>
+<body>
+  <div class="app">
+
+    <!-- Header -->
+    <header class="card header-card">
+      <div class="header-title">
+        <h1>SmartSense</h1>
+        <p class="subtitle">Harmonic-drive vibrodiagnostics &mdash; RMS trend, Joint Health Index &amp; predictive maintenance</p>
+      </div>
+      <div class="header-controls">
+        <select id="measurement-select"><option value="">Loading measurements&hellip;</option></select>
+        <button id="analyze-btn">Analyze</button>
+      </div>
+    </header>
+
+    <!-- Signal + Trend charts -->
+    <div class="charts-row">
+      <div class="card chart-card">
+        <h2 class="card-title">Signal View</h2>
+        <div id="signal-chart" class="plot-area"></div>
+      </div>
+      <div class="card chart-card">
+        <h2 class="card-title">Health Trend</h2>
+        <div id="trend-chart" class="plot-area"></div>
+      </div>
+    </div>
+
+    <!-- Live OPC-UA panel -->
+    <div class="card live-card">
+      <div class="live-header">
+        <h2 class="card-title">Live OPC-UA Data</h2>
+        <span class="live-badge" id="live-badge">&#9711; OFFLINE</span>
+        <div class="live-controls">
+          <label for="joint-select">Joint:</label>
+          <select id="joint-select" class="joint-select"></select>
+        </div>
+      </div>
+      <div id="live-chart" class="plot-area-live"></div>
+    </div>
+
+    <!-- Status row -->
+    <div class="status-row">
+
+      <!-- Health indicator -->
+      <div class="card health-card">
+        <h2 class="card-title">Joint Health Indicator</h2>
+        <div class="health-top">
+          <div class="health-light" id="health-light"></div>
+          <div class="health-info">
+            <div class="health-state" id="health-state">UNKNOWN</div>
+            <div class="health-jhi" id="health-jhi">JHI: &mdash;</div>
+            <div class="health-rec" id="health-rec">Waiting for analysis&hellip;</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prediction panel -->
+      <div class="card prediction-card">
+        <h2 class="card-title">Prediction Panel</h2>
+        <div class="metric">
+          <span class="metric-label">Time to critical threshold</span>
+          <span class="metric-value" id="hours-critical">&mdash;</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Remaining operating hours</span>
+          <span class="metric-value" id="op-hours-critical">&mdash;</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Current RMS vector</span>
+          <span class="metric-value" id="rms-value">&mdash;</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Dominant frequency</span>
+          <span class="metric-value" id="freq-value">&mdash;</span>
+        </div>
+      </div>
+
+      <!-- Dataset context -->
+      <div class="card meta-card">
+        <h2 class="card-title">Dataset Context</h2>
+        <div id="meta-content" class="meta-empty">Select a measurement and click Analyze.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

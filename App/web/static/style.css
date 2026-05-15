@@ -1,0 +1,336 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #E6F3EE 0%, #F8F3E9 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: #18332B;
+  font-size: 13px;
+}
+
+.app {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ── Cards ──────────────────────────────────────────── */
+
+.card {
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 24px;
+  border: 1px solid rgba(24, 51, 43, 0.08);
+  padding: 20px 24px;
+  backdrop-filter: blur(4px);
+}
+
+.card-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: #18332B;
+}
+
+/* ── Header ─────────────────────────────────────────── */
+
+.header-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 28px;
+}
+
+.header-title h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.header-title .subtitle {
+  color: #58756B;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.header-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+select {
+  height: 40px;
+  border-radius: 14px;
+  padding: 0 14px;
+  border: 1px solid rgba(24, 51, 43, 0.14);
+  background: white;
+  color: #18332B;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  min-width: 340px;
+}
+
+select:focus {
+  border-color: #1A9C74;
+}
+
+button {
+  height: 40px;
+  border-radius: 14px;
+  padding: 0 22px;
+  border: none;
+  background: #1A9C74;
+  color: white;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+button:hover:not(:disabled) {
+  background: #158b65;
+}
+
+button:disabled {
+  background: #8ecfba;
+  cursor: not-allowed;
+}
+
+/* ── Charts row ─────────────────────────────────────── */
+
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.chart-card {
+  min-height: 340px;
+}
+
+.plot-area {
+  height: 280px;
+}
+
+/* ── Live panel ─────────────────────────────────────── */
+
+.live-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.live-header .card-title {
+  margin-bottom: 0;
+}
+
+.live-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 11px;
+  border-radius: 20px;
+  background: #fee2e2;
+  color: #991b1b;
+  letter-spacing: 0.3px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.live-badge.connected {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.live-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #4C655D;
+  font-weight: 600;
+}
+
+.joint-select {
+  min-width: 120px;
+  height: 32px;
+  font-size: 12px;
+}
+
+.plot-area-live {
+  height: 220px;
+}
+
+/* ── Status row ─────────────────────────────────────── */
+
+.status-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 18px;
+}
+
+/* Health indicator */
+.health-top {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.health-light {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #94a3b8;
+  border: 5px solid rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+  transition: background 0.5s ease;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.06);
+}
+
+.health-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.health-state {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #18332B;
+}
+
+.health-jhi {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+  color: #18332B;
+}
+
+.health-rec {
+  color: #4C655D;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Prediction */
+.prediction-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(24, 51, 43, 0.07);
+}
+
+.metric:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.metric-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4C655D;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 2px;
+}
+
+.metric-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: #18332B;
+  line-height: 1.2;
+}
+
+/* Metadata */
+.meta-card {
+  overflow: hidden;
+}
+
+.meta-empty {
+  color: #7a9e93;
+  font-style: italic;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(24, 51, 43, 0.06);
+  gap: 12px;
+}
+
+.meta-row:last-child {
+  border-bottom: none;
+}
+
+.meta-key {
+  color: #4C655D;
+  font-weight: 600;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.meta-val {
+  color: #18332B;
+  font-size: 12px;
+  text-align: right;
+}
+
+.meta-threshold-row {
+  padding: 6px 0 0;
+  font-size: 11px;
+  color: #4C655D;
+  line-height: 1.6;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+
+@media (max-width: 1100px) {
+  .status-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .meta-card {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 780px) {
+  .charts-row,
+  .status-row {
+    grid-template-columns: 1fr;
+  }
+  .meta-card {
+    grid-column: span 1;
+  }
+  .header-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  select {
+    min-width: 200px;
+  }
+}

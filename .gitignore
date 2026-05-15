@@ -1,0 +1,30 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.user
+
+# Logs
+*.log
+
+# Measurement data — too large for git (1.7 GB)
+# data_demo/ is intentionally NOT ignored (truncated demo files ~43 MB)
+data/

@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(Get-ChildItem -Path \"C:\\\\SW_projects\\\\SmartSense\" -Recurse -Force)",
+      "Bash(Select-Object -Property FullName)",
+      "Bash(Sort-Object FullName)",
+      "Bash(Format-Table -AutoSize -Wrap)",
+      "WebFetch(domain:www.freetiers.com)",
+      "WebFetch(domain:docs.railway.com)",
+      "Bash(gh api *)",
+      "WebFetch(domain:github.com)",
+      "Bash(New-Item -ItemType Directory -Force -Path \"c:\\\\SW_projects\\\\SmartSense\\\\.github\\\\workflows\")",
+      "Bash(Out-Null)",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\SW_projects\\\\SmartSense\\\\.github\\\\workflows\")",
+      "PowerShell(\"ok\")",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\SW_projects\\\\SmartSense\\\\scripts\")",
+      "Bash(python scripts/make_demo_data.py)"
+    ]
+  }
+}
