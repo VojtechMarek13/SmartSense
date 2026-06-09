@@ -16,7 +16,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from src.health.index import HealthAssessment
-from src.opcua.client import OpcUaSimulator
+from src.opcua.client import JOINT_MAP, OpcUaClient, OpcUaSimulator
 from src.pipeline.analysis import DashboardAnalysis, SmartSenseAnalysisPipeline
 
 app = FastAPI(title="SmartSense")
@@ -32,21 +32,27 @@ _static_dir = Path(__file__).parent / "static"
 app.mount("/static", StaticFiles(directory=_static_dir), name="static")
 
 _pipeline = SmartSenseAnalysisPipeline()
-_simulator = OpcUaSimulator(_pipeline.loader)
-_sim_task: asyncio.Task | None = None
+_opcua_mode = os.environ.get("OPCUA_MODE", "simulator").lower() == "opcua"
+_live: OpcUaSimulator | OpcUaClient = (
+    OpcUaClient() if _opcua_mode else OpcUaSimulator(_pipeline.loader)
+)
+_live_task: asyncio.Task | None = None
 
 
 @app.on_event("startup")
 async def _startup() -> None:
-    global _sim_task
-    measurements = _pipeline.list_measurements()
-    _sim_task = asyncio.create_task(_simulator.run(measurements))
+    global _live_task
+    if isinstance(_live, OpcUaSimulator):
+        measurements = _pipeline.list_measurements()
+        _live_task = asyncio.create_task(_live.run(measurements))
+    else:
+        _live_task = asyncio.create_task(_live.run())
 
 
 @app.on_event("shutdown")
 async def _shutdown() -> None:
-    if _sim_task:
-        _sim_task.cancel()
+    if _live_task:
+        _live_task.cancel()
 
 
 @app.get("/", include_in_schema=False)
@@ -81,20 +87,22 @@ async def analyze(measurement_id: int) -> dict:
 
 @app.get("/api/joints")
 async def list_joints() -> list[str]:
+    if isinstance(_live, OpcUaClient):
+        return list(JOINT_MAP.keys())
     measurements = _pipeline.list_measurements()
     return sorted({m.joint for m in measurements})
 
 
 @app.post("/api/live/joint/{joint_name}")
 async def set_live_joint(joint_name: str) -> dict:
-    _simulator.set_joint(joint_name)
+    _live.set_joint(joint_name)
     return {"joint": joint_name}
 
 
 @app.websocket("/ws/live")
 async def live_stream(websocket: WebSocket) -> None:
     await websocket.accept()
-    queue = _simulator.subscribe()
+    queue = _live.subscribe()
     try:
         while True:
             point = await queue.get()
@@ -102,7 +110,7 @@ async def live_stream(websocket: WebSocket) -> None:
     except (WebSocketDisconnect, Exception):
         pass
     finally:
-        _simulator.unsubscribe(queue)
+        _live.unsubscribe(queue)
 
 
 # ---------------------------------------------------------------------------
