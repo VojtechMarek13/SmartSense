@@ -161,6 +161,16 @@ def _serialize(analysis: DashboardAnalysis) -> dict:
                 if assessment.estimated_hours_to_critical is not None
                 else None
             ),
+            "hours_to_critical_lower_90": (
+                round(assessment.hours_to_critical_lower_90, 1)
+                if assessment.hours_to_critical_lower_90 is not None
+                else None
+            ),
+            "hours_to_critical_upper_90": (
+                round(assessment.hours_to_critical_upper_90, 1)
+                if assessment.hours_to_critical_upper_90 is not None
+                else None
+            ),
             "op_hours_to_critical": (
                 round(assessment.estimated_operating_hours_to_critical, 1)
                 if assessment.estimated_operating_hours_to_critical is not None

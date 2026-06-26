@@ -255,6 +255,13 @@ button:disabled {
   line-height: 1.2;
 }
 
+.metric-ci {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+  font-style: italic;
+}
+
 /* Metadata */
 .meta-card {
   overflow: hidden;

@@ -326,6 +326,13 @@ function updateStatusCards(status, meta) {
       ? `${status.hours_to_critical} h`
       : 'Stable / no crossing';
 
+  const _ciEl = document.getElementById('hours-critical-ci');
+  if (status.hours_to_critical_lower_90 !== null && status.hours_to_critical_upper_90 !== null) {
+    _ciEl.textContent = `90% CI: ${status.hours_to_critical_lower_90} – ${status.hours_to_critical_upper_90} h`;
+  } else {
+    _ciEl.textContent = '';
+  }
+
   document.getElementById('op-hours-critical').textContent =
     status.op_hours_to_critical !== null
       ? `${status.op_hours_to_critical} h`

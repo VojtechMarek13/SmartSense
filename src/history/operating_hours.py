@@ -66,14 +66,32 @@ class OperatingHoursRegistry:
     def fit_severity_trend(
         self,
         points: Sequence[HistoricalConditionPoint],
-    ) -> tuple[float, float] | None:
+    ) -> tuple[float, float, float, float] | None:
+        """Return (slope, intercept, slope_std, intercept_std).
+
+        std values are 0.0 when there are too few points for covariance estimation.
+        """
         if len(points) < 2:
             return None
 
         x = np.asarray([point.operating_hours for point in points], dtype=np.float64)
         y = np.asarray([point.severity_score for point in points], dtype=np.float64)
+
+        if len(points) >= 3:
+            try:
+                coeffs, cov = np.polyfit(x, y, deg=1, cov=True)
+                if np.all(np.isfinite(cov)):
+                    return (
+                        float(coeffs[0]),
+                        float(coeffs[1]),
+                        float(np.sqrt(cov[0, 0])),
+                        float(np.sqrt(cov[1, 1])),
+                    )
+            except (np.linalg.LinAlgError, ValueError):
+                pass
+
         slope, intercept = np.polyfit(x, y, deg=1)
-        return float(slope), float(intercept)
+        return float(slope), float(intercept), 0.0, 0.0
 
     @staticmethod
     def _normalize_date(value: str) -> str:

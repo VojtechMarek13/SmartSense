@@ -54,6 +54,8 @@ class HealthAssessment:
     regression_slope_per_hour: float
     regression_intercept: float
     estimated_hours_to_critical: Optional[float]
+    hours_to_critical_lower_90: Optional[float]
+    hours_to_critical_upper_90: Optional[float]
     estimated_operating_hours_to_critical: Optional[float]
     recommendation: str
     historical_threshold_profile: Optional[HistoricalThresholdProfile]
@@ -173,12 +175,13 @@ class JointHealthAnalyzer:
                 )
             )
 
-        regression_slope_per_hour, regression_intercept = self._fit_health_trend(timeline)
-        estimated_hours_to_critical = self._estimate_time_to_critical(
+        regression_slope_per_hour, regression_intercept, _trend_cov = self._fit_health_trend(timeline)
+        estimated_hours_to_critical, hours_lower_90, hours_upper_90 = self._estimate_time_to_critical(
             timeline,
             regression_slope_per_hour,
             regression_intercept,
             effective_critical_score,
+            _trend_cov,
         )
         estimated_operating_hours_to_critical = self._estimate_operating_hours_to_critical(
             current_operating_hours=current_operating_hours,
@@ -201,6 +204,8 @@ class JointHealthAnalyzer:
             regression_slope_per_hour=regression_slope_per_hour,
             regression_intercept=regression_intercept,
             estimated_hours_to_critical=estimated_hours_to_critical,
+            hours_to_critical_lower_90=hours_lower_90,
+            hours_to_critical_upper_90=hours_upper_90,
             estimated_operating_hours_to_critical=estimated_operating_hours_to_critical,
             recommendation=self._recommendation(
                 current_state,
@@ -274,21 +279,29 @@ class JointHealthAnalyzer:
             return "WARNING"
         return "NORMAL"
 
-    def _fit_health_trend(self, timeline: Sequence[JointHealthTimelinePoint]) -> tuple[float, float]:
+    def _fit_health_trend(
+        self, timeline: Sequence[JointHealthTimelinePoint]
+    ) -> tuple[float, float, Optional[np.ndarray]]:
         if len(timeline) < 2:
-            return 0.0, timeline[0].health_index
+            return 0.0, timeline[0].health_index, None
 
         start_time = timeline[0].timestamp
         elapsed_hours = np.asarray(
-            [
-                max((point.timestamp - start_time).total_seconds() / 3600.0, 0.0)
-                for point in timeline
-            ],
+            [max((p.timestamp - start_time).total_seconds() / 3600.0, 0.0) for p in timeline],
             dtype=np.float64,
         )
-        health_values = np.asarray([point.health_index for point in timeline], dtype=np.float64)
+        health_values = np.asarray([p.health_index for p in timeline], dtype=np.float64)
+
+        if len(timeline) >= 3:
+            try:
+                coeffs, cov = np.polyfit(elapsed_hours, health_values, deg=1, cov=True)
+                if np.all(np.isfinite(cov)):
+                    return float(coeffs[0]), float(coeffs[1]), cov
+            except (np.linalg.LinAlgError, ValueError):
+                pass
+
         slope, intercept = np.polyfit(elapsed_hours, health_values, deg=1)
-        return float(slope), float(intercept)
+        return float(slope), float(intercept), None
 
     def _estimate_time_to_critical(
         self,
@@ -296,14 +309,43 @@ class JointHealthAnalyzer:
         slope_per_hour: float,
         intercept: float,
         critical_score: float,
-    ) -> Optional[float]:
+        cov: Optional[np.ndarray] = None,
+    ) -> tuple[Optional[float], Optional[float], Optional[float]]:
         if slope_per_hour <= 0:
-            return None
+            return None, None, None
 
-        current_hours = max((timeline[-1].timestamp - timeline[0].timestamp).total_seconds() / 3600.0, 0.0)
+        current_hours = max(
+            (timeline[-1].timestamp - timeline[0].timestamp).total_seconds() / 3600.0, 0.0
+        )
         predicted_crossing_hours = (critical_score - intercept) / slope_per_hour
         remaining = predicted_crossing_hours - current_hours
-        return float(remaining) if remaining > 0 else 0.0
+
+        if remaining <= 0:
+            return 0.0, None, None
+
+        mean_hours = float(remaining)
+
+        if cov is None:
+            return mean_hours, None, None
+
+        # Delta method: x_c = (y_c - b) / a  →  r = x_c - x_current
+        # ∂r/∂a = -x_c / a,   ∂r/∂b = -1 / a
+        a = slope_per_hour
+        x_c = predicted_crossing_hours
+        var_r = (
+            (x_c / a) ** 2 * cov[0, 0]
+            + (1.0 / a) ** 2 * cov[1, 1]
+            - 2.0 * (x_c / a) * (1.0 / a) * cov[0, 1]
+        )
+
+        if not np.isfinite(var_r) or var_r < 0:
+            return mean_hours, None, None
+
+        std_r = float(np.sqrt(var_r))
+        z90 = 1.645
+        lower = float(max(0.0, remaining - z90 * std_r))
+        upper = float(remaining + z90 * std_r)
+        return mean_hours, lower, upper
 
     @staticmethod
     def _estimate_operating_hours_to_critical(
