@@ -4,7 +4,6 @@
 
 <p align="center">
   <b>Vibrodiagnostics & predictive maintenance for collaborative robot harmonic drives.</b><br/>
-  <a href="https://vojtechmarek13.github.io/SmartSense/">Live Demo</a> &nbsp;·&nbsp;
   <a href="https://vojtechmarek13.github.io/SmartSense/?backend=https://YOUR_TUNNEL.trycloudflare.com">Live Workplace</a>
 </p>
 
@@ -15,10 +14,11 @@ SmartSense monitors the health of harmonic-drive joints in collaborative robots 
 ## Features
 
 - **Joint Health Index** — weighted scoring from RMS, crest factor, spectral analysis, trend and operating age
-- **Predictive maintenance** — linear regression extrapolation estimates hours remaining to critical threshold
+- **Predictive maintenance with Bayesian uncertainty** — linear regression with delta-method propagation estimates hours to critical threshold + 90 % confidence interval
 - **Live OPC UA streaming** — real-time vibration waveform over WebSocket; connects to B&R APC PLC via `asyncua`, falls back to CSV simulator
 - **Historical calibration** — dynamic warning/critical thresholds adapted from measurement history across dates
-- **Dual interface** — PyQt6 desktop dashboard + FastAPI web dashboard from the same backend
+- **CSV upload & ad-hoc analysis** — upload any CSV, pick X/Y columns and sampling rate; system re-calibrates baseline and shows full health analysis in-session without saving to disk
+- **Dual interface** — PyQt6 desktop dashboard + FastAPI web dashboard from the same pipeline
 
 ## Architecture
 
@@ -48,7 +48,7 @@ gCMCtrl_3:  [0]=Joint 5 X  [1]=Joint 5 Y  [2]=Cobot X    [3]=Cobot Y
 | Backend | Python 3.11, FastAPI, Uvicorn, asyncua |
 | Signal processing | NumPy, FFT |
 | Desktop GUI | PyQt6, Matplotlib |
-| ML bridge | PyTorch (placeholder — ready for model integration) |
+| Uncertainty | NumPy delta method — 90 % CI on time-to-critical prediction |
 | Frontend | Vanilla JS, Plotly.js |
 | Deployment | GitHub Pages · Cloudflare Tunnel |
 
@@ -117,9 +117,11 @@ Only `data_demo/` (13 MB, truncated samples) is committed for the static demo.
 ## Project status
 
 - Functional heuristic JHI scoring across 5 joints, 3 measurement dates (Feb–Mar 2026)
-- GitHub Pages frontend live, Cloudflare Tunnel tested and working
-- Real OPC UA client implemented and tested — live data from B&R APC PLC via `asyncua` subscriptions
-- PyTorch bridge prepared for future ML model integration
+- GitHub Pages frontend (static sample data), Cloudflare Tunnel for live workplace access
+- Real OPC UA client implemented and tested — live data from B&R APC PLC via `asyncua` subscriptions at 20 Hz
+- Bayesian uncertainty (delta method) on JHI time-to-critical prediction — 90 % CI displayed in both web and desktop UI
+- CSV upload for ad-hoc analysis in both web and desktop dashboard (session-only, no disk storage)
+- PyQt6 desktop dashboard visually aligned with the web app (navy/sky-blue design system)
 
 ---
 
