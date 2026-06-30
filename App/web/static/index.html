@@ -19,6 +19,8 @@
       <div class="header-controls">
         <select id="measurement-select"><option value="">Loading measurements&hellip;</option></select>
         <button id="analyze-btn">Analyze</button>
+        <input type="file" id="csv-file-input" accept=".csv" style="display:none">
+        <button id="upload-btn" class="btn-secondary">&#8593; Upload CSV</button>
       </div>
     </header>
 
@@ -91,6 +93,34 @@
         <div id="meta-content" class="meta-empty">Select a measurement and click Analyze.</div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- CSV Upload Modal -->
+  <div class="modal-overlay" id="upload-modal" style="display:none" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3 class="modal-title">Configure CSV Analysis</h3>
+      <div class="modal-info" id="upload-info"></div>
+      <div class="modal-field">
+        <label class="modal-label" for="upload-x-col">X axis column</label>
+        <select id="upload-x-col" class="modal-select"></select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label" for="upload-y-col">Y axis column</label>
+        <select id="upload-y-col" class="modal-select"></select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label" for="upload-label">Dataset label</label>
+        <input type="text" id="upload-label" class="modal-input" placeholder="My dataset" />
+      </div>
+      <div class="modal-field">
+        <label class="modal-label" for="upload-sr">Sampling rate (Hz)</label>
+        <input type="number" id="upload-sr" class="modal-input" value="1000" min="1" max="1000000" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary modal-cancel" id="upload-cancel-btn">Cancel</button>
+        <button id="upload-analyze-btn">Analyze</button>
+      </div>
     </div>
   </div>
 

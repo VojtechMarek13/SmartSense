@@ -70,6 +70,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('analyze-btn').addEventListener('click', onAnalyzeClick);
   document.getElementById('joint-select').addEventListener('change', onJointChange);
+
+  // CSV upload
+  document.getElementById('upload-btn').addEventListener('click', () => {
+    document.getElementById('csv-file-input').click();
+  });
+  document.getElementById('csv-file-input').addEventListener('change', onCsvFileSelected);
+  document.getElementById('upload-cancel-btn').addEventListener('click', closeUploadModal);
+  document.getElementById('upload-analyze-btn').addEventListener('click', onUploadAnalyze);
 });
 
 // ── Measurements ─────────────────────────────────────────────────────────────
@@ -359,4 +367,92 @@ function updateStatusCards(status, meta) {
 
 function row(key, val) {
   return `<div class="meta-row"><span class="meta-key">${key}</span><span class="meta-val">${val}</span></div>`;
+}
+
+// ── CSV Upload ────────────────────────────────────────────────────────────────
+
+let _currentUploadId = null;
+
+async function onCsvFileSelected(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+
+  const btn = document.getElementById('upload-btn');
+  btn.textContent = 'Uploading…';
+  btn.disabled = true;
+
+  try {
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch(`${BACKEND_URL}/api/upload/preview`, { method: 'POST', body: form });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: `HTTP ${res.status}` }));
+      throw new Error(err.detail || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    _currentUploadId = data.upload_id;
+
+    const xSel = document.getElementById('upload-x-col');
+    const ySel = document.getElementById('upload-y-col');
+    xSel.innerHTML = '';
+    ySel.innerHTML = '';
+    data.columns.forEach(col => {
+      xSel.appendChild(new Option(col, col));
+      ySel.appendChild(new Option(col, col));
+    });
+    if (data.columns.length > 1) ySel.selectedIndex = 1;
+
+    document.getElementById('upload-label').value = file.name.replace(/\.csv$/i, '');
+    document.getElementById('upload-info').textContent =
+      `${file.name} · ${data.rows.toLocaleString()} rows · ${data.columns.length} columns`;
+
+    document.getElementById('upload-modal').style.display = 'flex';
+  } catch (err) {
+    alert(`Upload failed: ${err.message}`);
+  } finally {
+    btn.textContent = '↑ Upload CSV';
+    btn.disabled = false;
+    ev.target.value = '';
+  }
+}
+
+function closeUploadModal() {
+  document.getElementById('upload-modal').style.display = 'none';
+  _currentUploadId = null;
+}
+
+async function onUploadAnalyze() {
+  if (!_currentUploadId) return;
+
+  const btn = document.getElementById('upload-analyze-btn');
+  btn.textContent = 'Analyzing…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/upload/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        upload_id: _currentUploadId,
+        x_col: document.getElementById('upload-x-col').value,
+        y_col: document.getElementById('upload-y-col').value,
+        label: document.getElementById('upload-label').value || 'Uploaded',
+        sampling_rate_hz: parseFloat(document.getElementById('upload-sr').value) || 1000,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: `HTTP ${res.status}` }));
+      throw new Error(err.detail || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    renderSignalChart(data.signal);
+    renderTrendChart(data.trend);
+    updateStatusCards(data.status, data.meta);
+    closeUploadModal();
+  } catch (err) {
+    alert(`Analysis failed: ${err.message}`);
+  } finally {
+    btn.textContent = 'Analyze';
+    btn.disabled = false;
+  }
 }

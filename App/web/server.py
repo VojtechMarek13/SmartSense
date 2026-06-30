@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import csv
+import io
 import os
 import sys
+import uuid
 from pathlib import Path
 
 project_root = Path(__file__).resolve().parents[2]
@@ -10,10 +13,11 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 import numpy as np
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, File, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
 from src.health.index import HealthAssessment
 from src.opcua.client import JOINT_MAP, OpcUaClient, OpcUaSimulator
@@ -33,6 +37,17 @@ app.mount("/static", StaticFiles(directory=_static_dir), name="static")
 
 _pipeline = SmartSenseAnalysisPipeline()
 _opcua_mode = os.environ.get("OPCUA_MODE", "simulator").lower() == "opcua"
+
+_uploads: dict[str, dict] = {}
+_MAX_UPLOADS = 10
+
+
+class _UploadAnalyzeRequest(BaseModel):
+    upload_id: str
+    x_col: str
+    y_col: str
+    label: str = "Uploaded"
+    sampling_rate_hz: float = 1000.0
 _live: OpcUaSimulator | OpcUaClient = (
     OpcUaClient() if _opcua_mode else OpcUaSimulator(_pipeline.loader)
 )
@@ -111,6 +126,72 @@ async def live_stream(websocket: WebSocket) -> None:
         pass
     finally:
         _live.unsubscribe(queue)
+
+
+# ---------------------------------------------------------------------------
+# CSV Upload
+# ---------------------------------------------------------------------------
+
+@app.post("/api/upload/preview")
+async def upload_preview(file: UploadFile = File(...)) -> dict:
+    content = await file.read()
+    try:
+        text = content.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = content.decode("latin-1")
+
+    try:
+        dialect = csv.Sniffer().sniff(text[:4096], delimiters=",;\t")
+    except csv.Error:
+        dialect = csv.excel
+
+    reader = csv.DictReader(io.StringIO(text), dialect=dialect)
+    columns = list(reader.fieldnames or [])
+    if not columns:
+        raise HTTPException(status_code=400, detail="Could not detect CSV columns")
+
+    rows = list(reader)
+    if not rows:
+        raise HTTPException(status_code=400, detail="CSV file is empty")
+
+    if len(_uploads) >= _MAX_UPLOADS:
+        oldest = next(iter(_uploads))
+        del _uploads[oldest]
+
+    upload_id = str(uuid.uuid4())[:8]
+    _uploads[upload_id] = {"columns": columns, "rows": rows}
+    return {"upload_id": upload_id, "columns": columns, "rows": len(rows)}
+
+
+@app.post("/api/upload/analyze")
+async def upload_analyze(body: _UploadAnalyzeRequest) -> dict:
+    if body.upload_id not in _uploads:
+        raise HTTPException(status_code=404, detail="Upload session not found — please re-upload the file")
+
+    rows = _uploads[body.upload_id]["rows"]
+    x_values, y_values = [], []
+    for row in rows:
+        try:
+            x_values.append(float(str(row[body.x_col]).replace(",", ".")))
+            y_values.append(float(str(row[body.y_col]).replace(",", ".")))
+        except (KeyError, ValueError):
+            continue
+
+    if not x_values:
+        raise HTTPException(status_code=400, detail=f"No numeric data found in columns '{body.x_col}' / '{body.y_col}'")
+
+    x_arr = np.asarray(x_values, dtype=np.float64)
+    y_arr = np.asarray(y_values, dtype=np.float64)
+
+    try:
+        analysis = await asyncio.to_thread(
+            _pipeline.analyze_uploaded_signal,
+            x_arr, y_arr, body.x_col, body.y_col, body.label, body.sampling_rate_hz,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
+    return _serialize(analysis)
 
 
 # ---------------------------------------------------------------------------
