@@ -27,28 +27,28 @@ const WS_URL = BACKEND_URL.replace(/^http/, 'ws') + '/ws/live';
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const COLORS = {
-  signalX:    '#0ea5e9',
-  signalY:    '#f59e0b',
-  rms:        '#3b82f6',
-  movingAvg:  '#10b981',
-  jhi:        '#6366f1',
-  warning:    '#f59e0b',
-  critical:   '#ef4444',
+  signalX:    '#33A3FF',
+  signalY:    '#FF6640',
+  rms:        '#640ABA',
+  movingAvg:  '#3DBF4C',
+  jhi:        '#FF5999',
+  warning:    '#FFC226',
+  critical:   '#FF6640',
 };
 
 const STATE_COLORS = {
-  NORMAL:   '#22c55e',
-  WARNING:  '#f59e0b',
-  CRITICAL: '#ef4444',
+  NORMAL:   '#3DBF4C',
+  WARNING:  '#FFC226',
+  CRITICAL: '#FF6640',
 };
 
 const PLOT_DEFAULTS = {
   paper_bgcolor: 'rgba(0,0,0,0)',
-  plot_bgcolor:  '#f8fafc',
-  font:          { family: 'Segoe UI, system-ui, sans-serif', size: 12, color: '#0f172a' },
+  plot_bgcolor:  '#F5F2F8',
+  font:          { family: "'GT America', 'Hanken Grotesk', Arial, sans-serif", size: 12, color: '#640ABA' },
   margin:        { t: 16, r: 16, b: 44, l: 56 },
   showlegend:    true,
-  legend:        { bgcolor: 'rgba(255,255,255,0.7)', bordercolor: 'rgba(0,0,0,0)', x: 0, y: 1 },
+  legend:        { bgcolor: 'rgba(255,255,255,0.85)', bordercolor: 'rgba(0,0,0,0)', x: 0, y: 1 },
 };
 
 const PLOTLY_CONFIG = { responsive: true, displayModeBar: false };
@@ -115,7 +115,7 @@ async function onAnalyzeClick() {
   if (id === '') return;
 
   const btn = document.getElementById('analyze-btn');
-  btn.textContent = 'Analyzing…';
+  btn.textContent = 'Analyzuji…';
   btn.disabled = true;
 
   try {
@@ -127,9 +127,9 @@ async function onAnalyzeClick() {
     updateStatusCards(data.status, data.meta);
   } catch (err) {
     console.error('Analysis error:', err);
-    alert('Analysis failed. Check the server log.');
+    alert('Analýza selhala. Zkontrolujte log serveru.');
   } finally {
-    btn.textContent = 'Analyze';
+    btn.textContent = 'Analyzovat';
     btn.disabled = false;
   }
 }
@@ -158,8 +158,8 @@ function renderSignalChart(signal) {
 
   const layout = {
     ...PLOT_DEFAULTS,
-    xaxis: { title: 'Sample index (downsampled view)', gridcolor: '#e2e8f0', zeroline: false },
-    yaxis: { title: 'Acceleration [mg]',               gridcolor: '#e2e8f0', zeroline: false },
+    xaxis: { title: 'Index vzorku (zmenšený náhled)', gridcolor: '#E0DBE5', zeroline: false },
+    yaxis: { title: 'Zrychlení [mg]',               gridcolor: '#E0DBE5', zeroline: false },
     legend: { ...PLOT_DEFAULTS.legend, x: 0.72, y: 1 },
   };
 
@@ -172,21 +172,21 @@ function renderTrendChart(trend) {
   const traces = [
     {
       x: trend.windows, y: trend.rms,
-      name: 'RMS vector [mg]',
+      name: 'Vektor RMS [mg]',
       type: 'scatter', mode: 'lines',
       line: { color: COLORS.rms, width: 1.8 },
       yaxis: 'y',
     },
     {
       x: trend.windows, y: trend.moving_avg_rms,
-      name: 'Moving avg RMS',
+      name: 'Klouzavý průměr RMS',
       type: 'scatter', mode: 'lines',
       line: { color: COLORS.movingAvg, width: 1.4, dash: 'dash' },
       yaxis: 'y',
     },
     {
       x: trend.windows, y: trend.jhi,
-      name: 'Joint Health Index',
+      name: 'Index zdraví kloubu (JHI)',
       type: 'scatter', mode: 'lines',
       line: { color: COLORS.jhi, width: 2.1 },
       yaxis: 'y2',
@@ -196,10 +196,10 @@ function renderTrendChart(trend) {
   const layout = {
     ...PLOT_DEFAULTS,
     margin: { ...PLOT_DEFAULTS.margin, r: 64 },
-    xaxis:  { title: 'Sliding window', gridcolor: '#e2e8f0', zeroline: false },
-    yaxis:  { title: 'RMS vector [mg]', gridcolor: '#e2e8f0', zeroline: false },
+    xaxis:  { title: 'Posuvné okno', gridcolor: '#E0DBE5', zeroline: false },
+    yaxis:  { title: 'Vektor RMS [mg]', gridcolor: '#E0DBE5', zeroline: false },
     yaxis2: {
-      title: 'Joint Health Index',
+      title: 'Index zdraví kloubu (JHI)',
       overlaying: 'y', side: 'right',
       range: [0, 100],
       gridcolor: 'rgba(0,0,0,0)',
@@ -227,27 +227,27 @@ function renderTrendChart(trend) {
 function initEmptyCharts() {
   const emptyLayout = {
     ...PLOT_DEFAULTS,
-    xaxis: { title: 'Sample', gridcolor: '#e2e8f0', zeroline: false },
-    yaxis: { title: 'Acceleration [mg]', gridcolor: '#e2e8f0', zeroline: false },
+    xaxis: { title: 'Vzorek', gridcolor: '#E0DBE5', zeroline: false },
+    yaxis: { title: 'Zrychlení [mg]', gridcolor: '#E0DBE5', zeroline: false },
     margin: { ...PLOT_DEFAULTS.margin, t: 10 },
     legend: { ...PLOT_DEFAULTS.legend, x: 0.82, y: 1 },
   };
 
   // Empty signal / trend placeholders
-  Plotly.newPlot('signal-chart', [], { ...emptyLayout, xaxis: { ...emptyLayout.xaxis, title: 'Sample index' } }, PLOTLY_CONFIG);
+  Plotly.newPlot('signal-chart', [], { ...emptyLayout, xaxis: { ...emptyLayout.xaxis, title: 'Index vzorku' } }, PLOTLY_CONFIG);
   Plotly.newPlot('trend-chart',  [], emptyLayout, PLOTLY_CONFIG);
 
   // Live chart — two pre-allocated traces
   Plotly.newPlot('live-chart', [
     {
       x: [], y: [],
-      name: 'X axis',
+      name: 'Osa X',
       type: 'scatter', mode: 'lines',
       line: { color: COLORS.signalX, width: 1.0 },
     },
     {
       x: [], y: [],
-      name: 'Y axis',
+      name: 'Osa Y',
       type: 'scatter', mode: 'lines',
       line: { color: COLORS.signalY, width: 1.0 },
     },
@@ -276,7 +276,7 @@ function connectWebSocket() {
   ws = new WebSocket(WS_URL);
 
   ws.onopen = () => {
-    badge.textContent = '● LIVE';
+    badge.textContent = '● ŽIVĚ';
     badge.classList.add('connected');
     if (wsReconnectTimer) {
       clearTimeout(wsReconnectTimer);
@@ -307,13 +307,13 @@ async function onJointChange() {
   await fetch(`${BACKEND_URL}/api/live/joint/${encodeURIComponent(joint)}`, { method: 'POST' });
   // Clear current live trace
   Plotly.react('live-chart', [
-    { x: [], y: [], name: 'X axis', type: 'scatter', mode: 'lines', line: { color: COLORS.signalX, width: 1.0 } },
-    { x: [], y: [], name: 'Y axis', type: 'scatter', mode: 'lines', line: { color: COLORS.signalY, width: 1.0 } },
+    { x: [], y: [], name: 'Osa X', type: 'scatter', mode: 'lines', line: { color: COLORS.signalX, width: 1.0 } },
+    { x: [], y: [], name: 'Osa Y', type: 'scatter', mode: 'lines', line: { color: COLORS.signalY, width: 1.0 } },
   ], {
     ...PLOT_DEFAULTS,
     margin: { t: 8, r: 16, b: 40, l: 56 },
-    xaxis: { title: 'Sample', gridcolor: '#e2e8f0', zeroline: false },
-    yaxis: { title: 'Acceleration [mg]', gridcolor: '#e2e8f0', zeroline: false },
+    xaxis: { title: 'Vzorek', gridcolor: '#E0DBE5', zeroline: false },
+    yaxis: { title: 'Zrychlení [mg]', gridcolor: '#E0DBE5', zeroline: false },
     legend: { ...PLOT_DEFAULTS.legend, x: 0.82, y: 1 },
   }, PLOTLY_CONFIG);
 }
@@ -323,7 +323,8 @@ async function onJointChange() {
 function updateStatusCards(status, meta) {
   // Health light + text
   const light = document.getElementById('health-light');
-  light.style.background = STATE_COLORS[status.state] ?? '#94a3b8';
+  light.style.background = STATE_COLORS[status.state] ?? '#E0DBE5';
+  document.getElementById('health-card').dataset.state = (status.state || 'unknown').toLowerCase();
   document.getElementById('health-state').textContent = status.state;
   document.getElementById('health-jhi').textContent   = `JHI: ${status.jhi}`;
   document.getElementById('health-rec').textContent   = status.recommendation;
@@ -332,11 +333,11 @@ function updateStatusCards(status, meta) {
   document.getElementById('hours-critical').textContent =
     status.hours_to_critical !== null
       ? `${status.hours_to_critical} h`
-      : 'Stable / no crossing';
+      : 'Stabilní / bez překročení';
 
   const _ciEl = document.getElementById('hours-critical-ci');
   if (status.hours_to_critical_lower_90 !== null && status.hours_to_critical_upper_90 !== null) {
-    _ciEl.textContent = `90% CI: ${status.hours_to_critical_lower_90} – ${status.hours_to_critical_upper_90} h`;
+    _ciEl.textContent = `90% IS: ${status.hours_to_critical_lower_90} – ${status.hours_to_critical_upper_90} h`;
   } else {
     _ciEl.textContent = '';
   }
@@ -344,23 +345,23 @@ function updateStatusCards(status, meta) {
   document.getElementById('op-hours-critical').textContent =
     status.op_hours_to_critical !== null
       ? `${status.op_hours_to_critical} h`
-      : 'Historical estimate unavailable';
+      : 'Historický odhad není k dispozici';
 
   document.getElementById('rms-value').textContent  = `${status.current_rms} mg`;
   document.getElementById('freq-value').textContent = `${status.dominant_freq_hz} Hz`;
 
   // Metadata
   const thresholdLine = (meta.warning_hours !== null && meta.critical_hours !== null)
-    ? `<div class="meta-threshold-row">Op. hours to warning / critical: <strong>${meta.warning_hours} h</strong> / <strong>${meta.critical_hours} h</strong></div>`
-    : `<div class="meta-threshold-row">Operating-hour thresholds: not enough historical data</div>`;
+    ? `<div class="meta-threshold-row">Provozní hodiny do varování / kritického stavu: <strong>${meta.warning_hours} h</strong> / <strong>${meta.critical_hours} h</strong></div>`
+    : `<div class="meta-threshold-row">Prahy provozních hodin: nedostatek historických dat</div>`;
 
   document.getElementById('meta-content').innerHTML = [
-    row('Joint',         meta.joint),
-    row('Date',          meta.date),
-    row('Station',       meta.station),
-    row('Trajectory',    meta.trajectory),
-    row('Sampling rate', `${meta.sampling_rate_hz} Hz`),
-    row('Signals',       `${meta.x_column} / ${meta.y_column}`),
+    row('Kloub',         meta.joint),
+    row('Datum',          meta.date),
+    row('Stanice',       meta.station),
+    row('Trajektorie',    meta.trajectory),
+    row('Vzorkování', `${meta.sampling_rate_hz} Hz`),
+    row('Signály',       `${meta.x_column} / ${meta.y_column}`),
     thresholdLine,
   ].join('');
 }
@@ -378,7 +379,7 @@ async function onCsvFileSelected(ev) {
   if (!file) return;
 
   const btn = document.getElementById('upload-btn');
-  btn.textContent = 'Uploading…';
+  btn.textContent = 'Nahrávám…';
   btn.disabled = true;
 
   try {
@@ -404,13 +405,13 @@ async function onCsvFileSelected(ev) {
 
     document.getElementById('upload-label').value = file.name.replace(/\.csv$/i, '');
     document.getElementById('upload-info').textContent =
-      `${file.name} · ${data.rows.toLocaleString()} rows · ${data.columns.length} columns`;
+      `${file.name} · ${data.rows.toLocaleString()} řádků · ${data.columns.length} sloupců`;
 
     document.getElementById('upload-modal').style.display = 'flex';
   } catch (err) {
-    alert(`Upload failed: ${err.message}`);
+    alert(`Nahrání selhalo: ${err.message}`);
   } finally {
-    btn.textContent = '↑ Upload CSV';
+    btn.textContent = '↑ Nahrát CSV';
     btn.disabled = false;
     ev.target.value = '';
   }
@@ -425,7 +426,7 @@ async function onUploadAnalyze() {
   if (!_currentUploadId) return;
 
   const btn = document.getElementById('upload-analyze-btn');
-  btn.textContent = 'Analyzing…';
+  btn.textContent = 'Analyzuji…';
   btn.disabled = true;
 
   try {
@@ -436,7 +437,7 @@ async function onUploadAnalyze() {
         upload_id: _currentUploadId,
         x_col: document.getElementById('upload-x-col').value,
         y_col: document.getElementById('upload-y-col').value,
-        label: document.getElementById('upload-label').value || 'Uploaded',
+        label: document.getElementById('upload-label').value || 'Nahrané',
         sampling_rate_hz: parseFloat(document.getElementById('upload-sr').value) || 1000,
       }),
     });
@@ -450,9 +451,9 @@ async function onUploadAnalyze() {
     updateStatusCards(data.status, data.meta);
     closeUploadModal();
   } catch (err) {
-    alert(`Analysis failed: ${err.message}`);
+    alert(`Analýza selhala: ${err.message}`);
   } finally {
-    btn.textContent = 'Analyze';
+    btn.textContent = 'Analyzovat';
     btn.disabled = false;
   }
 }

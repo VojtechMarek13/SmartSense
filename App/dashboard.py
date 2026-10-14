@@ -44,15 +44,15 @@ from src.pipeline.analysis import DashboardAnalysis, SmartSenseAnalysisPipeline
 
 
 STATE_COLORS = {
-    "NORMAL": "#22c55e",
-    "WARNING": "#f59e0b",
-    "CRITICAL": "#ef4444",
+    "NORMAL": "#3DBF4C",
+    "WARNING": "#FFC226",
+    "CRITICAL": "#FF6640",
 }
 
 
 class MplCanvas(FigureCanvasQTAgg):
     def __init__(self) -> None:
-        figure = Figure(figsize=(5, 4), dpi=100, facecolor="#f8fafc")
+        figure = Figure(figsize=(5, 4), dpi=100, facecolor="#F5F2F8")
         self.axes = figure.add_subplot(111)
         super().__init__(figure)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -65,13 +65,13 @@ class HealthLight(QFrame):
         self.setObjectName("healthLight")
 
     def set_state(self, state: str) -> None:
-        color = STATE_COLORS.get(state, "#64748B")
+        color = STATE_COLORS.get(state, "#E0DBE5")
         self.setStyleSheet(
             f"""
             QFrame#healthLight {{
                 background: {color};
-                border-radius: 46px;
-                border: 6px solid rgba(255, 255, 255, 0.65);
+                border-radius: 0px;
+                border: 5px solid #640ABA;
             }}
             """
         )
@@ -196,88 +196,87 @@ class DashboardWindow(QMainWindow):
         self.setStyleSheet(
             """
             QMainWindow, QWidget#central {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #f0f9ff, stop:1 #f8fafc);
+                background: #E0DBE5;
             }
             QWidget {
-                color: #0f172a;
-                font-family: "Segoe UI";
+                color: #640ABA;
+                font-family: "GT America", "Hanken Grotesk", "Segoe UI";
                 font-size: 12px;
             }
             QFrame[card="true"] {
-                background: rgba(255, 255, 255, 0.92);
-                border-radius: 24px;
-                border: 1px solid rgba(15, 23, 42, 0.08);
+                background: #FFFFFF;
+                border-radius: 0px;
+                border: none;
             }
             QLabel#appTitle {
                 font-size: 26px;
                 font-weight: 800;
-                color: #0f172a;
+                color: #640ABA;
                 letter-spacing: -0.5px;
             }
             QLabel#appTitleAccent {
                 font-size: 26px;
                 font-weight: 800;
-                color: #0ea5e9;
+                color: #640ABA;
                 letter-spacing: -0.5px;
             }
             QLabel#subtitle {
-                color: #475569;
+                color: #640ABA;
                 font-size: 12px;
             }
             QLabel#cardTitle {
                 font-size: 17px;
                 font-weight: 700;
-                color: #0f172a;
+                color: #640ABA;
             }
             QLabel#metricHeading {
                 font-size: 11px;
                 font-weight: 700;
-                color: #475569;
+                color: #640ABA;
                 text-transform: uppercase;
                 letter-spacing: 0.4px;
             }
             QLabel#metricValue {
                 font-size: 22px;
                 font-weight: 800;
-                color: #0f172a;
+                color: #640ABA;
             }
             QLabel#metricCi {
                 font-size: 11px;
-                color: #64748b;
+                color: #640ABA;
                 font-style: italic;
             }
             QLabel#metricText {
-                color: #475569;
+                color: #640ABA;
                 font-size: 12px;
             }
             QComboBox {
                 min-height: 40px;
-                border-radius: 14px;
+                border-radius: 0px;
                 padding: 0px 14px;
-                border: 1px solid rgba(15, 23, 42, 0.14);
+                border: 2px solid #640ABA;
                 background: white;
-                color: #0f172a;
+                color: #640ABA;
             }
-            QComboBox:focus { border-color: #0ea5e9; }
+            QComboBox:focus { background: #E0DBE5; }
             QPushButton {
                 min-height: 40px;
-                border-radius: 14px;
+                border-radius: 0px;
                 padding: 0px 22px;
-                border: none;
-                background: #0ea5e9;
+                border: 2px solid #640ABA;
+                background: #640ABA;
                 color: white;
                 font-weight: 700;
                 font-size: 13px;
             }
-            QPushButton:hover { background: #0284c7; }
-            QPushButton:disabled { background: #7dd3fc; }
+            QPushButton:hover { background: #FFD880; color: #640ABA; }
+            QPushButton:disabled { background: #C7A0E8; }
             QPushButton#secondaryBtn {
                 background: white;
-                color: #0ea5e9;
-                border: 1.5px solid #0ea5e9;
+                color: #640ABA;
+                border: 1.5px solid #640ABA;
             }
-            QPushButton#secondaryBtn:hover { background: #f0f9ff; }
+            QPushButton#secondaryBtn:hover { background: #88C9FF; }
             """
         )
 
@@ -294,7 +293,7 @@ class DashboardWindow(QMainWindow):
         if _HAS_SVG and logo_path.exists():
             logo = QSvgWidget(str(logo_path))
             logo.setFixedHeight(52)
-            logo.setFixedWidth(260)
+            logo.setFixedWidth(340)
             title_box.addWidget(logo)
         else:
             title_row = QHBoxLayout()
@@ -502,21 +501,21 @@ class DashboardWindow(QMainWindow):
         indices = np.linspace(0, len(timestamps) - 1, sample_count, dtype=int)
         x_axis = np.arange(sample_count)
 
-        ax.set_facecolor("#f8fafc")
-        ax.plot(x_axis, x_signal[indices], color="#0ea5e9", linewidth=1.3, label="Raw X")
-        ax.plot(x_axis, y_signal[indices], color="#f59e0b", linewidth=1.0, alpha=0.9, label="Raw Y")
+        ax.set_facecolor("#F5F2F8")
+        ax.plot(x_axis, x_signal[indices], color="#33A3FF", linewidth=1.3, label="Raw X")
+        ax.plot(x_axis, y_signal[indices], color="#FF6640", linewidth=1.0, alpha=0.9, label="Raw Y")
 
         window_points = min(1024, len(x_signal))
         if window_points > 16:
             processed = x_signal[:window_points] - np.mean(x_signal[:window_points])
             processed_x = np.linspace(0, sample_count * (window_points / len(x_signal)), window_points)
-            ax.plot(processed_x, processed, color="#0f172a", linewidth=1.0, label="Processed X")
+            ax.plot(processed_x, processed, color="#640ABA", linewidth=1.0, label="Processed X")
 
-        ax.set_title("Raw and Processed Vibration Signal", color="#0f172a")
-        ax.set_xlabel("Sample index (downsampled view)", color="#475569")
-        ax.set_ylabel("Acceleration [mg]", color="#475569")
-        ax.tick_params(colors="#475569")
-        ax.grid(alpha=0.5, color="#e2e8f0")
+        ax.set_title("Raw and Processed Vibration Signal", color="#640ABA")
+        ax.set_xlabel("Sample index (downsampled view)", color="#640ABA")
+        ax.set_ylabel("Acceleration [mg]", color="#640ABA")
+        ax.tick_params(colors="#640ABA")
+        ax.grid(alpha=0.5, color="#E0DBE5")
         ax.legend(loc="upper right")
         self.signal_canvas.draw_idle()
 
@@ -534,18 +533,18 @@ class DashboardWindow(QMainWindow):
         rms_values = np.asarray([point.rms_vector for point in assessment.timeline], dtype=np.float64)
         health_values = np.asarray([point.health_index for point in assessment.timeline], dtype=np.float64)
 
-        ax.set_facecolor("#f8fafc")
-        ax2.set_facecolor("#f8fafc")
-        line1 = ax.plot(x_axis, rms_values, color="#3b82f6", linewidth=1.8, label="RMS vector [mg]")[0]
+        ax.set_facecolor("#F5F2F8")
+        ax2.set_facecolor("#F5F2F8")
+        line1 = ax.plot(x_axis, rms_values, color="#640ABA", linewidth=1.8, label="RMS vector [mg]")[0]
         line2 = ax.plot(
             x_axis,
             assessment.moving_average * assessment.baseline_rms,
-            color="#10b981",
+            color="#3DBF4C",
             linewidth=1.4,
             linestyle="--",
             label="Moving avg RMS",
         )[0]
-        line3 = ax2.plot(x_axis, health_values, color="#6366f1", linewidth=2.1, label="Joint Health Index")[0]
+        line3 = ax2.plot(x_axis, health_values, color="#FF5999", linewidth=2.1, label="Joint Health Index")[0]
 
         warning_score = (
             assessment.historical_threshold_profile.warning_score
@@ -557,16 +556,16 @@ class DashboardWindow(QMainWindow):
             if assessment.historical_threshold_profile is not None
             else assessment.thresholds.warning_max_score
         )
-        ax2.axhline(warning_score, color="#f59e0b", linestyle=":", linewidth=1.4)
-        ax2.axhline(critical_score, color="#ef4444", linestyle=":", linewidth=1.4)
+        ax2.axhline(warning_score, color="#FFC226", linestyle=":", linewidth=1.4)
+        ax2.axhline(critical_score, color="#FF6640", linestyle=":", linewidth=1.4)
 
-        ax.set_title("RMS and Health Trend", color="#0f172a")
-        ax.set_xlabel("Sliding window", color="#475569")
-        ax.set_ylabel("RMS vector [mg]", color="#475569")
-        ax2.set_ylabel("Joint Health Index", color="#475569")
-        ax.tick_params(colors="#475569")
-        ax2.tick_params(colors="#475569")
-        ax.grid(alpha=0.5, color="#e2e8f0")
+        ax.set_title("RMS and Health Trend", color="#640ABA")
+        ax.set_xlabel("Sliding window", color="#640ABA")
+        ax.set_ylabel("RMS vector [mg]", color="#640ABA")
+        ax2.set_ylabel("Joint Health Index", color="#640ABA")
+        ax.tick_params(colors="#640ABA")
+        ax2.tick_params(colors="#640ABA")
+        ax.grid(alpha=0.5, color="#E0DBE5")
         ax2.set_ylim(0, 100)
         ax.legend([line1, line2, line3], [line1.get_label(), line2.get_label(), line3.get_label()], loc="upper left")
         self.trend_canvas.draw_idle()

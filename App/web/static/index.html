@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SmartSense</title>
+  <title>SmartSense – JIC Smart Factory</title>
   <link rel="icon" type="image/svg+xml" href="/static/smartsense_icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&family=Newsreader:opsz,wght@6..72,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/style.css" />
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 </head>
@@ -13,25 +16,27 @@
 
     <!-- Header -->
     <header class="card header-card">
-      <div class="header-title">
-        <img src="/static/smartsense_logo.svg" alt="SmartSense" class="header-logo" />
+      <div class="header-title header-brand">
+        <img src="/static/jic_logo.svg" alt="JIC" class="jic-logo" />
+        <span class="brand-divider" aria-hidden="true"></span>
+        <img src="/static/smartsense_logo.svg" alt="SmartSense – JIC Smart Factory" class="header-logo" />
       </div>
       <div class="header-controls">
-        <select id="measurement-select"><option value="">Loading measurements&hellip;</option></select>
-        <button id="analyze-btn">Analyze</button>
+        <select id="measurement-select"><option value="">Načítání měření&hellip;</option></select>
+        <button id="analyze-btn">Analyzovat</button>
         <input type="file" id="csv-file-input" accept=".csv" style="display:none">
-        <button id="upload-btn" class="btn-secondary">&#8593; Upload CSV</button>
+        <button id="upload-btn" class="btn-secondary">&#8593; Nahrát CSV</button>
       </div>
     </header>
 
     <!-- Signal + Trend charts -->
     <div class="charts-row">
       <div class="card chart-card">
-        <h2 class="card-title">Signal View</h2>
+        <h2 class="card-title">Signál</h2>
         <div id="signal-chart" class="plot-area"></div>
       </div>
       <div class="card chart-card">
-        <h2 class="card-title">Health Trend</h2>
+        <h2 class="card-title">Trend zdraví</h2>
         <div id="trend-chart" class="plot-area"></div>
       </div>
     </div>
@@ -39,10 +44,10 @@
     <!-- Live OPC-UA panel -->
     <div class="card live-card">
       <div class="live-header">
-        <h2 class="card-title">Live OPC-UA Data</h2>
+        <h2 class="card-title">Živá data OPC-UA</h2>
         <span class="live-badge" id="live-badge">&#9711; OFFLINE</span>
         <div class="live-controls">
-          <label for="joint-select">Joint:</label>
+          <label for="joint-select">Kloub:</label>
           <select id="joint-select" class="joint-select"></select>
         </div>
       </div>
@@ -53,44 +58,44 @@
     <div class="status-row">
 
       <!-- Health indicator -->
-      <div class="card health-card">
-        <h2 class="card-title">Joint Health Indicator</h2>
+      <div class="card health-card" id="health-card" data-state="unknown">
+        <h2 class="card-title">Zdraví kloubu</h2>
         <div class="health-top">
           <div class="health-light" id="health-light"></div>
           <div class="health-info">
-            <div class="health-state" id="health-state">UNKNOWN</div>
+            <div class="health-state" id="health-state">NEZNÁMÝ</div>
             <div class="health-jhi" id="health-jhi">JHI: &mdash;</div>
-            <div class="health-rec" id="health-rec">Waiting for analysis&hellip;</div>
+            <div class="health-rec" id="health-rec">Čekání na analýzu&hellip;</div>
           </div>
         </div>
       </div>
 
       <!-- Prediction panel -->
       <div class="card prediction-card">
-        <h2 class="card-title">Prediction Panel</h2>
+        <h2 class="card-title">Predikce</h2>
         <div class="metric">
-          <span class="metric-label">Time to critical threshold</span>
+          <span class="metric-label">Čas do kritické hranice</span>
           <span class="metric-value" id="hours-critical">&mdash;</span>
           <span class="metric-ci" id="hours-critical-ci"></span>
         </div>
         <div class="metric">
-          <span class="metric-label">Remaining operating hours</span>
+          <span class="metric-label">Zbývající provozní hodiny</span>
           <span class="metric-value" id="op-hours-critical">&mdash;</span>
         </div>
         <div class="metric">
-          <span class="metric-label">Current RMS vector</span>
+          <span class="metric-label">Aktuální vektor RMS</span>
           <span class="metric-value" id="rms-value">&mdash;</span>
         </div>
         <div class="metric">
-          <span class="metric-label">Dominant frequency</span>
+          <span class="metric-label">Dominantní frekvence</span>
           <span class="metric-value" id="freq-value">&mdash;</span>
         </div>
       </div>
 
       <!-- Dataset context -->
       <div class="card meta-card">
-        <h2 class="card-title">Dataset Context</h2>
-        <div id="meta-content" class="meta-empty">Select a measurement and click Analyze.</div>
+        <h2 class="card-title">Kontext měření</h2>
+        <div id="meta-content" class="meta-empty">Vyberte měření a klikněte na Analyzovat.</div>
       </div>
 
     </div>
@@ -99,27 +104,27 @@
   <!-- CSV Upload Modal -->
   <div class="modal-overlay" id="upload-modal" style="display:none" role="dialog" aria-modal="true">
     <div class="modal-card">
-      <h3 class="modal-title">Configure CSV Analysis</h3>
+      <h3 class="modal-title">Nastavení analýzy CSV</h3>
       <div class="modal-info" id="upload-info"></div>
       <div class="modal-field">
-        <label class="modal-label" for="upload-x-col">X axis column</label>
+        <label class="modal-label" for="upload-x-col">Sloupec osy X</label>
         <select id="upload-x-col" class="modal-select"></select>
       </div>
       <div class="modal-field">
-        <label class="modal-label" for="upload-y-col">Y axis column</label>
+        <label class="modal-label" for="upload-y-col">Sloupec osy Y</label>
         <select id="upload-y-col" class="modal-select"></select>
       </div>
       <div class="modal-field">
-        <label class="modal-label" for="upload-label">Dataset label</label>
-        <input type="text" id="upload-label" class="modal-input" placeholder="My dataset" />
+        <label class="modal-label" for="upload-label">Název datové sady</label>
+        <input type="text" id="upload-label" class="modal-input" placeholder="Moje data" />
       </div>
       <div class="modal-field">
-        <label class="modal-label" for="upload-sr">Sampling rate (Hz)</label>
+        <label class="modal-label" for="upload-sr">Vzorkovací frekvence (Hz)</label>
         <input type="number" id="upload-sr" class="modal-input" value="1000" min="1" max="1000000" />
       </div>
       <div class="modal-actions">
-        <button class="btn-secondary modal-cancel" id="upload-cancel-btn">Cancel</button>
-        <button id="upload-analyze-btn">Analyze</button>
+        <button class="btn-secondary modal-cancel" id="upload-cancel-btn">Zrušit</button>
+        <button id="upload-analyze-btn">Analyzovat</button>
       </div>
     </div>
   </div>

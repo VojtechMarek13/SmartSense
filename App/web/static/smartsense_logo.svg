@@ -1,16 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="120" viewBox="0 0 480 120">
-  <g transform="translate(25,0)">
-    <rect x="0" y="12" width="96" height="96" rx="28" fill="#0f172a"/>
-    <polyline points="18,60 30,60 39,36 51,84 60,50 69,68 78,60"
-      stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <circle cx="84" cy="76" r="6" fill="#0ea5e9"/>
-    <text x="116" y="58"
-      font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-      font-weight="700" font-size="32" letter-spacing="-0.5"
-      fill="#0f172a">SMART<tspan fill="#0ea5e9">SENSE</tspan></text>
-    <text x="118" y="80"
-      font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-      font-weight="400" font-size="12" letter-spacing="3"
-      fill="#94a3b8">INDUSTRIAL MAINTENANCE AI</text>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="72" viewBox="0 0 440 72">
+  <rect width="72" height="72" fill="#640ABA"/>
+  <rect x="9" y="45" width="9" height="18" fill="#fff"/>
+  <rect x="21" y="33" width="9" height="30" fill="#fff"/>
+  <rect x="33" y="12" width="9" height="51" fill="#fff"/>
+  <rect x="45" y="27" width="9" height="36" fill="#fff"/>
+  <rect x="57" y="39" width="9" height="24" fill="#fff"/>
+  <text x="90" y="40" font-family="'GT America','Hanken Grotesk',Arial,sans-serif" font-weight="700" font-size="30" fill="#640ABA">SmartSense</text>
+  <text x="91" y="63" font-family="'GT America','Hanken Grotesk',Arial,sans-serif" font-size="14" font-weight="500" letter-spacing="1.6" fill="#640ABA">JIC SMART FACTORY</text>
 </svg>

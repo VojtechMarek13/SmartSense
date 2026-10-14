@@ -121,8 +121,12 @@ Only `data_demo/` (13 MB, truncated samples) is committed for the static demo.
 - Real OPC UA client implemented and tested — live data from B&R APC PLC via `asyncua` subscriptions at 20 Hz
 - Bayesian uncertainty (delta method) on JHI time-to-critical prediction — 90 % CI displayed in both web and desktop UI
 - CSV upload for ad-hoc analysis in both web and desktop dashboard (session-only, no disk storage)
-- PyQt6 desktop dashboard visually aligned with the web app (navy/sky-blue design system)
+- Web and desktop dashboards follow the JIC 2.0 design manual (Smart Factory style: purple #640ABA, pastel palette, square pixel geometry, GT America / GT Super Display fonts)
 
 ---
 
 *Internal research project — JIC (Jihomoravské inovační centrum)*
+
+## Brand fonts
+
+The UI uses the JIC brand fonts GT America and GT Super Display. They are licensed and not stored in the repo: copy `GTAmerica-{Regular,Medium,Bold}.woff2` and `GTSuperDisplay-Regular.woff2` into `App/web/static/fonts/` (see the README there). Without them, Hanken Grotesk and Newsreader from Google Fonts are used. The desktop app uses the fonts if they are installed in Windows.
