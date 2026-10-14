@@ -248,6 +248,7 @@ class OpcUaClient:
 
             interval = 1.0 / self.EMIT_HZ
             while True:
+                await client.check_connection()
                 sensor, xi, yi = JOINT_MAP.get(self._joint, JOINT_MAP["Joint 1"])
                 point = {
                     "t": self._t,

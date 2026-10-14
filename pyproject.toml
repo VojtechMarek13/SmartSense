@@ -2,7 +2,7 @@
 name = "smartsense"
 version = "0.1.0"
 description = "Industrial vibrodiagnostics and predictive maintenance for harmonic drives."
-requires-python = ">=3.14,<3.15"
+requires-python = ">=3.11"
 dependencies = [
   "numpy",
   "torch",
@@ -14,4 +14,4 @@ dependencies = [
 ]
 
 [tool.smartsense]
-python-version = "3.14"
+python-version = "3.11"
