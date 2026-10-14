@@ -19,31 +19,37 @@ function Refresh-Path {
                 [Environment]::GetEnvironmentVariable("Path", "User")
 }
 
+function Winget-Install($id) {
+    # --source winget: skip the msstore source, which fails on some networks
+    # (certificate error 0x8a15005e) and makes winget refuse to pick a package.
+    winget install --id $id -e --source winget --silent --accept-package-agreements --accept-source-agreements
+    if ($LASTEXITCODE -ne 0) { throw "winget failed to install $id (exit code $LASTEXITCODE)" }
+    Refresh-Path
+}
+
 function Ensure-WingetPackage($id, $probe) {
     if (Get-Command $probe -ErrorAction SilentlyContinue) {
         Write-Host "    $id already installed"
         return
     }
-    winget install --id $id -e --silent --accept-package-agreements --accept-source-agreements
-    Refresh-Path
+    Winget-Install $id
 }
 
 # 1) System tools
 Step "Installing Git, Python 3.11, cloudflared"
 Ensure-WingetPackage "Git.Git" "git"
 if (-not (Get-Command py -ErrorAction SilentlyContinue) -or -not (& py -3.11 --version 2>$null)) {
-    winget install --id Python.Python.3.11 -e --silent --accept-package-agreements --accept-source-agreements
-    Refresh-Path
+    Winget-Install "Python.Python.3.11"
 }
 Ensure-WingetPackage "Cloudflare.cloudflared" "cloudflared"
 
 # 2) Source code
 Step "Getting source code into $Target"
 if (Test-Path (Join-Path $Target ".git")) {
-    git -C $Target pull --ff-only
+    git -C $Target -c http.sslBackend=schannel pull --ff-only
 } else {
     New-Item -ItemType Directory -Force (Split-Path $Target) | Out-Null
-    git clone $RepoUrl $Target
+    git -c http.sslBackend=schannel clone $RepoUrl $Target
 }
 Set-Location $Target
 
@@ -51,9 +57,13 @@ Set-Location $Target
 Step "Creating .venv311 and installing dependencies (torch is large, takes a while)"
 if (-not (Test-Path ".venv311\Scripts\python.exe")) { py -3.11 -m venv .venv311 }
 $py = Join-Path $Target ".venv311\Scripts\python.exe"
-& $py -m pip install --upgrade pip
+# truststore = use the Windows certificate store (works behind TLS-inspecting proxies)
+& $py -m pip install --use-feature=truststore --upgrade pip
+if ($LASTEXITCODE -ne 0) { throw "pip upgrade failed" }
 & $py -m pip install -e .
+if ($LASTEXITCODE -ne 0) { throw "pip install failed" }
 & $py -m pip install -r requirements-web.txt
+if ($LASTEXITCODE -ne 0) { throw "pip install failed" }
 
 # 4) VS Code
 Step "Configuring VS Code"
