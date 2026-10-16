@@ -87,6 +87,23 @@ data/Joint {1-5}/{DD.MM.YYYY}/Cobot Stand/Trajectory {1-5}/
 > `data_demo/` (committed) contains truncated 5 000-row samples for the static demo.
 > Regenerate after adding new measurements: `python scripts/make_demo_data.py`
 
+## Station events (Power BI)
+
+Events for the efficiency dashboard are written to `Desktop\Home\sf6\events\SF6_events_YYYY-MM-DD.csv`
+(`station_id,event_type,ts,boot_id,seq`, one file per day):
+
+| Event | Written by |
+|---|---|
+| `STATION_ON` / `STATION_OFF` | station logger (`src/events/station_logger.py`) at logon / shutdown |
+| `CYCLE_START` / `CYCLE_DONE` | first SmartSense app (desktop or web) started / last one closed |
+
+Install the logger once per PC (done by `scripts/setup_new_pc.ps1`):
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\install_station_logger.ps1
+```
+Counters live in `%LOCALAPPDATA%\SmartSense\events_state.json`, the logger log in `station_logger.log` next to it.
+After a power loss the missing `CYCLE_DONE` / `STATION_OFF` are filled in on the next start with the last heartbeat time.
+
 ## Deployment
 
 ### GitHub Pages — frontend

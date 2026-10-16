@@ -19,6 +19,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from src.events import station_log
 from src.health.index import HealthAssessment
 from src.opcua.client import JOINT_MAP, OpcUaClient, OpcUaSimulator
 from src.pipeline.analysis import DashboardAnalysis, SmartSenseAnalysisPipeline
@@ -57,6 +58,7 @@ _live_task: asyncio.Task | None = None
 @app.on_event("startup")
 async def _startup() -> None:
     global _live_task
+    station_log.app_started()
     if isinstance(_live, OpcUaSimulator):
         measurements = _pipeline.list_measurements()
         _live_task = asyncio.create_task(_live.run(measurements))
@@ -68,6 +70,7 @@ async def _startup() -> None:
 async def _shutdown() -> None:
     if _live_task:
         _live_task.cancel()
+    station_log.app_stopped()
 
 
 @app.get("/", include_in_schema=False)

@@ -40,6 +40,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from src.events import station_log
 from src.pipeline.analysis import DashboardAnalysis, SmartSenseAnalysisPipeline
 
 
@@ -648,4 +649,5 @@ def run() -> int:
     pipeline = SmartSenseAnalysisPipeline()
     window = DashboardWindow(pipeline)
     window.show()
-    return app.exec()
+    with station_log.smartsense_cycle():
+        return app.exec()

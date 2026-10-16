@@ -1,7 +1,8 @@
 # SmartSense - one-shot setup for a fresh Windows PC.
 #
 # Installs Git, Python 3.11 and cloudflared (via winget), clones the repo,
-# creates .venv311 with all dependencies and configures VS Code.
+# creates .venv311 with all dependencies, configures VS Code and installs
+# the station event logger.
 #
 # Usage (PowerShell, no admin needed - winget may ask for UAC):
 #   irm https://raw.githubusercontent.com/VojtechMarek13/SmartSense/main/scripts/setup_new_pc.ps1 | iex
@@ -80,7 +81,11 @@ if (Get-Command code -ErrorAction SilentlyContinue) {
 # Allow venv activation scripts in the VS Code terminal
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned -Force
 
-# 5) Sanity check
+# 5) Station event logger (Power BI efficiency dashboard)
+Step "Installing station event logger (starts at logon)"
+& (Join-Path $Target "scripts\install_station_logger.ps1")
+
+# 6) Sanity check
 Step "Verifying imports"
 & $py -c "import numpy, torch, PyQt6, matplotlib, fastapi, asyncua; print('    all imports OK')"
 
